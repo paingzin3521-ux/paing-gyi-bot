@@ -4,11 +4,22 @@ import random
 import string
 from datetime import datetime, timedelta
 
+# [!] Paing Gyi ရဲ့ Token
 TOKEN = "8557413081:AAH5eWNAVr9U8TN6M3SywY34O4Ooy7gWJZc"
 bot = telebot.TeleBot(TOKEN)
 
-ADMIN_ID = 1000037717 
+# Admin Information
 ADMIN_NAME = "Pᴀɪɴɢ Zɪɴ Aᴜɴɢ X"
+
+# PRO Text Art Design
+PRO_DESIGN = (
+    "██████╗ ██████╗  ██████╗ \n"
+    "██╔══██╗██╔══██╗██╔═══██╗\n"
+    "██████╔╝██████╔╝██║   ██║\n"
+    "██╔═══╝ ██╔══██╗██║   ██║\n"
+    "██║     ██║  ██║╚██████╔╝\n"
+    "╚═╝     ╚═╝  ╚═╝ ╚═════╝ \n"
+)
 
 def generate_locked_key(device_id, prefix):
     id_part = str(device_id)[-4:] if len(str(device_id)) >= 4 else str(device_id)
@@ -23,45 +34,46 @@ def start(message):
     btn3 = types.KeyboardButton('👤 Contact Admin')
     markup.add(btn1, btn2, btn3)
     
-    welcome = (
-        f"🌟 **PAING GYI VIP KEY BOT**\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n"
-        f"👤 Admin: {ADMIN_NAME}\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"ID ပေးပြီး Key ယူနိုင်ပါပြီ။"
+    # က Header Design အတိုင်းဖြစ်အောင်လုပ်ထားသည်
+    header = (
+        f"`{PRO_DESIGN}`\n"
+        f"`>>> AI TECHNOLOGY VOUCHER BYPASS SYSTEM <<<`\n"
+        f"━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        f"Key ယူရန် အောက်က ခလုတ်ကို နှိပ်ပါဗျ။"
     )
-    bot.send_message(message.chat.id, welcome, reply_markup=markup, parse_mode="Markdown")
+    bot.send_message(message.chat.id, header, reply_markup=markup, parse_mode="Markdown")
 
 @bot.message_handler(func=lambda message: message.text in ['🚀 Internet Speed Bypass', '🔑 Voucher Code Hack'])
 def ask_for_id(message):
     prefix = "SPEED" if "Speed" in message.text else "VOUCH"
-    msg = bot.send_message(message.chat.id, f"🆔 {message.text} အတွက် **Device ID** ကို ရိုက်ပို့ပေးပါဗျ။")
+    msg = bot.send_message(message.chat.id, f"🆔 {message.text} အတွက် **Device ID** ကို ပို့ပေးပါဗျ။")
     bot.register_next_step_handler(msg, process_id, prefix)
 
 def process_id(message, prefix):
-    # အရေးကြီးဆုံးအချက် - ခလုတ်စာသားတွေကို ID အဖြစ် လုံးဝ လက်မခံပါ
     if message.text in ['🚀 Internet Speed Bypass', '🔑 Voucher Code Hack', '👤 Contact Admin', '/start']:
-        bot.send_message(message.chat.id, "❌ ID မှားယွင်းနေပါသည်။ ခလုတ်ကို မနှိပ်ဘဲ ID ကိုသာ ရိုက်ပို့ပေးပါဗျ။")
+        bot.send_message(message.chat.id, "❌ ID မှားယွင်းနေပါသည်။ ID ကိုသာ ရိုက်ပို့ပေးပါဗျ။")
         return
 
     minutes = 120 if prefix == "SPEED" else 30
     final_key = generate_locked_key(message.text, prefix)
     expiry_time = (datetime.now() + timedelta(minutes=minutes)).strftime('%I:%M %p')
 
+    # က Box Design ကိုယူသုံးထားသည်
     result = (
-        f"🔐 **{prefix} HACK SUCCESS**\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n"
+        f"╔═════════════════════════════╗\n"
+        f"    **{prefix} HACK SUCCESS**\n"
+        f"╚═════════════════════════════╝\n"
         f"📱 Device ID: `{message.text}`\n"
         f"🔑 Your Key: `{final_key}`\n\n"
-        f"⏰ သက်တမ်း: {minutes} မိနစ် ({expiry_time} အထိ)\n"
-        f"⚠️ ဤ Key ကို မိမိ ID အတွက်သာ သုံးပါ!\n"
+        f"⏰ Status: Active ({minutes} min)\n"
+        f"⌛ Expiry: {expiry_time}\n"
         f"━━━━━━━━━━━━━━━━━━━━\n"
-        f"👑 Admin: {ADMIN_NAME}"
+        f"👑 Owner: {ADMIN_NAME}"
     )
     bot.send_message(message.chat.id, result, parse_mode="Markdown")
 
 @bot.message_handler(func=lambda message: message.text == '👤 Contact Admin')
 def contact(message):
-    bot.send_message(message.chat.id, f"👨‍💻 Owner: {ADMIN_NAME}\nTelegram: @PaingGyi")
+    bot.send_message(message.chat.id, f"👨‍💻 Developer: {ADMIN_NAME}\nTelegram: @PaingGyi")
 
 bot.polling(none_stop=True)
