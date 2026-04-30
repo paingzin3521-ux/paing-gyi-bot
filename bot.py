@@ -1,13 +1,11 @@
-
-
-        import telebot
+import telebot
 from telebot import types
 import random
 import string
 import time
 from datetime import datetime, timedelta
 
-# [!] Token ကို ဒီမှာ သေချာစစ်ထည့်ပါ
+# [!] Paing Gyi ရဲ့ Token ကို ဒီမှာ ထည့်ပါ
 TOKEN = "8557413081:AAH5eWNAVr9U8TN6M3SywY34O4Ooy7gWJZc"
 bot = telebot.TeleBot(TOKEN)
 
@@ -43,6 +41,7 @@ def start(message):
     markup.add(btn1, btn2, btn3)
     bot.send_message(message.chat.id, design, reply_markup=markup)
 
+# --- Speed Bypass (120 min) ---
 @bot.message_handler(func=lambda message: message.text == '🚀 Internet Speed Bypass')
 def speed_ask_id(message):
     user_id = message.from_user.id
@@ -51,8 +50,9 @@ def speed_ask_id(message):
             bot.reply_to(message, "⏳ ၂၄ နာရီပြည့်မှ တစ်ခါပြန်ယူလို့ရပါမယ်။")
             return
     msg = bot.send_message(message.chat.id, "🆔 Speed တင်ရန် **Device ID** ပို့ပေးပါဗျ။")
-    bot.register_next_step_handler(msg, lambda m: process_key(m, "SPEED", 120))
+    bot.register_next_step_handler(msg, process_speed_key)
 
+# --- Voucher Hack (30 min သို့ ပြင်ထားသည်) ---
 @bot.message_handler(func=lambda message: message.text == '🔑 Voucher Code Hack')
 def voucher_ask_id(message):
     user_id = message.from_user.id
@@ -61,9 +61,21 @@ def voucher_ask_id(message):
             bot.reply_to(message, "⏳ တစ်ရက်လျှင် တစ်ခါသာ ခွင့်ပြုပါသည်။")
             return
     msg = bot.send_message(message.chat.id, "🆔 Voucher ထုတ်ရန် **Device ID** ပို့ပေးပါဗျ။")
-    bot.register_next_step_handler(msg, lambda m: process_key(m, "VOUCH", 45))
+    bot.register_next_step_handler(msg, process_voucher_key)
 
-def process_key(message, prefix, minutes):
+def process_speed_key(message):
+    if message.text in ['🚀 Internet Speed Bypass', '🔑 Voucher Code Hack', '👤 Contact Admin', '/start']:
+        bot.send_message(message.chat.id, "❌ ID မှားယွင်းနေပါသည်။ ခလုတ်မဟုတ်ဘဲ ID ကိုသာ ပို့ပေးပါ။")
+        return
+    handle_key_generation(message, "SPEED", 120)
+
+def process_voucher_key(message):
+    if message.text in ['🚀 Internet Speed Bypass', '🔑 Voucher Code Hack', '👤 Contact Admin', '/start']:
+        bot.send_message(message.chat.id, "❌ ID မှားယွင်းနေပါသည်။ ခလုတ်မဟုတ်ဘဲ ID ကိုသာ ပို့ပေးပါ။")
+        return
+    handle_key_generation(message, "VOUCH", 30) # ဒီနေရာမှာ 30 min ပြင်လိုက်ပါပြီ
+
+def handle_key_generation(message, prefix, minutes):
     device_id = message.text
     user_id = message.from_user.id
     final_key = generate_locked_key(device_id, prefix)
@@ -77,7 +89,7 @@ def process_key(message, prefix, minutes):
         f"✅ **{prefix} KEY SUCCESS**\n\n"
         f"📱 Device ID: `{device_id}`\n"
         f"🔑 Key: `{final_key}`\n"
-        f"⏰ Expiry: {expiry_time} အထိ\n\n"
+        f"⏰ သက်တမ်းကုန်မည့်အချိန်: {expiry_time}\n\n"
         f"©️ Developed by Paing Gyi"
     )
     bot.send_message(message.chat.id, result, parse_mode="Markdown")
