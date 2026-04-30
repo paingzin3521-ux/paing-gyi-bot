@@ -4,22 +4,10 @@ import random
 import string
 from datetime import datetime, timedelta
 
-# [!] Paing Gyi ရဲ့ Token
 TOKEN = "8557413081:AAH5eWNAVr9U8TN6M3SywY34O4Ooy7gWJZc"
 bot = telebot.TeleBot(TOKEN)
 
-# Admin Information
 ADMIN_NAME = "Pᴀɪɴɢ Zɪɴ Aᴜɴɢ X"
-
-# PRO Text Art Design
-PRO_DESIGN = (
-    "██████╗ ██████╗  ██████╗ \n"
-    "██╔══██╗██╔══██╗██╔═══██╗\n"
-    "██████╔╝██████╔╝██║   ██║\n"
-    "██╔═══╝ ██╔══██╗██║   ██║\n"
-    "██║     ██║  ██║╚██████╔╝\n"
-    "╚═╝     ╚═╝  ╚═╝ ╚═════╝ \n"
-)
 
 def generate_locked_key(device_id, prefix):
     id_part = str(device_id)[-4:] if len(str(device_id)) >= 4 else str(device_id)
@@ -34,14 +22,14 @@ def start(message):
     btn3 = types.KeyboardButton('👤 Contact Admin')
     markup.add(btn1, btn2, btn3)
     
-    # က Header Design အတိုင်းဖြစ်အောင်လုပ်ထားသည်
     header = (
-        f"`{PRO_DESIGN}`\n"
-        f"`>>> AI TECHNOLOGY VOUCHER BYPASS SYSTEM <<<`\n"
-        f"━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        f"╔════════════════════╗\n"
+        f"     PAING GYI VIP TOOL\n"
+        f"     DEVELOPER: {ADMIN_NAME}\n"
+        f"╚════════════════════╝\n\n"
         f"Key ယူရန် အောက်က ခလုတ်ကို နှိပ်ပါဗျ။"
     )
-    bot.send_message(message.chat.id, header, reply_markup=markup, parse_mode="Markdown")
+    bot.send_message(message.chat.id, header, reply_markup=markup)
 
 @bot.message_handler(func=lambda message: message.text in ['🚀 Internet Speed Bypass', '🔑 Voucher Code Hack'])
 def ask_for_id(message):
@@ -54,21 +42,24 @@ def process_id(message, prefix):
         bot.send_message(message.chat.id, "❌ ID မှားယွင်းနေပါသည်။ ID ကိုသာ ရိုက်ပို့ပေးပါဗျ။")
         return
 
-    minutes = 120 if prefix == "SPEED" else 30
+    # [!] ဒီနေရာမှာ Voucher ကို 30 min အတိအကျ ပြင်လိုက်ပါပြီ
+    if prefix == "SPEED":
+        minutes = 120
+    else:
+        minutes = 30  # Voucher Hack အတွက် 30 မိနစ်
+
     final_key = generate_locked_key(message.text, prefix)
     expiry_time = (datetime.now() + timedelta(minutes=minutes)).strftime('%I:%M %p')
 
-    # က Box Design ကိုယူသုံးထားသည်
     result = (
-        f"╔═════════════════════════════╗\n"
-        f"    **{prefix} HACK SUCCESS**\n"
-        f"╚═════════════════════════════╝\n"
+        f"🔐 **{prefix} HACK SUCCESS**\n"
+        f"━━━━━━━━━━━━━━━━━━━━\n"
         f"📱 Device ID: `{message.text}`\n"
         f"🔑 Your Key: `{final_key}`\n\n"
         f"⏰ Status: Active ({minutes} min)\n"
         f"⌛ Expiry: {expiry_time}\n"
         f"━━━━━━━━━━━━━━━━━━━━\n"
-        f"👑 Owner: {ADMIN_NAME}"
+        f"👑 Admin: {ADMIN_NAME}"
     )
     bot.send_message(message.chat.id, result, parse_mode="Markdown")
 
