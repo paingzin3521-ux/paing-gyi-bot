@@ -1,11 +1,13 @@
-import telebot
+
+
+        import telebot
 from telebot import types
 import random
 import string
 import time
 from datetime import datetime, timedelta
 
-# [!] ဒီနေရာမှာ Paing Gyi ရဲ့ Token ကို သေချာစစ်ထည့်ပါ
+# [!] Token ကို ဒီမှာ သေချာစစ်ထည့်ပါ
 TOKEN = "8557413081:AAH5eWNAVr9U8TN6M3SywY34O4Ooy7gWJZc"
 bot = telebot.TeleBot(TOKEN)
 
@@ -25,8 +27,14 @@ def is_admin(user_id):
 @bot.message_handler(commands=['start'])
 def start(message):
     user_id = message.from_user.id
-    status = "👑 ADMIN MODE" if is_admin(user_id) else "👤 USER MODE"
-    design = f"┏━━━━━━━━━━━━┓\n   PAING GYI ULTIMATE\n   STATUS: {status}\n┗━━━━━━━━━━━━┛"
+    status = "👑 ADMIN" if is_admin(user_id) else "👤 USER"
+    design = (
+        f"┏━━━━━━━━━━━━━━━━┓\n"
+        f"   PAING GYI ULTIMATE V1.0\n"
+        f"   STATUS: {status}\n"
+        f"┗━━━━━━━━━━━━━━━━┛\n\n"
+        f"ID ပေးပြီး Key ထုတ်ယူနိုင်ပါပြီဗျာ။"
+    )
     
     markup = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
     btn1 = types.KeyboardButton('🚀 Internet Speed Bypass')
@@ -59,15 +67,23 @@ def process_key(message, prefix, minutes):
     device_id = message.text
     user_id = message.from_user.id
     final_key = generate_locked_key(device_id, prefix)
+    
     if not is_admin(user_id):
         user_last_claim[user_id] = time.time()
+        
     expiry_time = (datetime.now() + timedelta(minutes=minutes)).strftime('%I:%M %p')
     
-    result = f"✅ **{prefix} SUCCESS**\n\n📱 ID: `{device_id}`\n🔑 Key: `{final_key}`\n⏰ Expiry: {expiry_time}"
+    result = (
+        f"✅ **{prefix} KEY SUCCESS**\n\n"
+        f"📱 Device ID: `{device_id}`\n"
+        f"🔑 Key: `{final_key}`\n"
+        f"⏰ Expiry: {expiry_time} အထိ\n\n"
+        f"©️ Developed by Paing Gyi"
+    )
     bot.send_message(message.chat.id, result, parse_mode="Markdown")
 
 @bot.message_handler(func=lambda message: message.text == '👤 Contact Admin')
 def contact(message):
-    bot.send_message(message.chat.id, "Admin: @PaingGyi")
+    bot.send_message(message.chat.id, "👨‍💻 Owner: @PaingGyi")
 
 bot.polling()
