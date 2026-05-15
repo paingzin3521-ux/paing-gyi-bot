@@ -1,7 +1,25 @@
 import telebot
 import google.generativeai as genai
 from telebot import types
-import time
+import os
+from flask import Flask
+from threading import Thread
+
+# --- Flask Web Server Setup (Render Free Web Service အတွက် Port အလုပ်လုပ်အောင် လုပ်ခြင်း) ---
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "StarLink AI Bot is Running Successfully!"
+
+def run():
+    # Render က ပေးမယ့် Port သို့မဟုတ် ပုံမှန် Port 8080 ကို သုံးမယ်
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host='0.0.0.0', port=port)
+
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
 
 # --- API Keys ---
 BOT_TOKEN = '8672537028:AAG0zs5ljD3MGjLaibW2IQpt1Sd5Ci7O0d4'
@@ -15,13 +33,12 @@ bot = telebot.TeleBot(BOT_TOKEN)
 
 # ဆဲစာလုံးများ
 bad_words = [
-    'စောက်', 'လိုး', 'မအေလိုး', 'ဖာသည်', 'ဖာတန်း', 'မိဖာ', 'ဖာခေါင်း', 'နှမလိုး', 
+    'စောက်', 'လိုး', 'မအေလိုး', 'ဖာသည်', 'ဖာတန်း', 'မိဖာ', 'ဖာخောင်း', 'နှမလိုး', 
     'ဘော', 'ဘောမ', 'စောက်ရူး', 'စောက်ပေါ', 'ငါးလိုး', 'ဂွေး', 'ခွေးမသား', 
     'မျိုးမစစ်', 'မအေဘေး', 'လီး', 'လီးပဲ', 'ပုထွေး', 'စောက်ဖုတ်', 'အဖုတ်', 
     'စောက်ပတ်', 'လိုးမသား', 'အေလိုး', 'မအေလိုးမ', 'လီးလား', 'စောက်ခွက်'
 ]
 
-# --- Helper Function: Admin ဟုတ်မဟုတ် စစ်ဆေးခြင်း ---
 def is_user_admin(chat_id, user_id):
     try:
         member = bot.get_chat_member(chat_id, user_id)
@@ -29,7 +46,7 @@ def is_user_admin(chat_id, user_id):
     except:
         return False
 
-# --- ၁။ လူသစ်ဝင်လာလျှင် ကြိုဆိုခြင်း (Mute စာသားကို ဖယ်ရှားထားပါသည်) ---
+# --- ၁။ လူသစ်ဝင်လာလျှင် ကြိုဆိုခြင်း ---
 @bot.message_handler(content_types=['new_chat_members'])
 def welcome_new_member(message):
     group_name = message.chat.title if message.chat.title else "ကျွန်တော်တို့ Group"
@@ -56,14 +73,12 @@ def welcome_new_member(message):
 def admin_commands(message):
     if message.chat.type == "private": return
     
-    # ရိုက်တဲ့သူက Admin ဟုတ်မဟုတ် စစ်မယ်
     if not is_user_admin(message.chat.id, message.from_user.id):
         bot.reply_to(message, "❌ ဒီ Command ကို သုံးခွင့်ရှိတာ Admin များသာ ဖြစ်ပါတယ်ဗျ။")
         return
         
     command = message.text.split()[0].lower()
 
-    # /unban အတွက် ID နဲ့ တိုက်ရိုက်ပယ်ဖျက်ခွင့်ပေးခြင်း
     if command == '/unban':
         args = message.text.split()
         if len(args) < 2:
@@ -78,7 +93,6 @@ def admin_commands(message):
             bot.reply_to(message, "❌ Error: ID မှားနေခြင်း (သို့မဟုတ်) Bot မှာ Permission မရှိလို့ ဖြစ်နိုင်ပါတယ်ဗျာ။")
         return
 
-    # ကျန်တဲ့ Command တွေအတွက် Reply စနစ်သုံးမယ်
     if not message.reply_to_message:
         bot.reply_to(message, f"⚠️ ဒီ `{command}` Command ကို သုံးဖို့အတွက် အရေးယူချင်တဲ့သူရဲ့စာကို Reply ပြန်ပြီး ရိုက်ပေးပါဗျာ။", parse_mode='Markdown')
         return
@@ -90,7 +104,7 @@ def admin_commands(message):
     try:
         if command == '/ban':
             bot.ban_chat_member(message.chat.id, t_id)
-            bot.reply_to(message, f"🚨 **Ban လိုက်ပြီ!**\n👤 **Name:** {t_name}\n🆔 **User ID:** `{t_id}`\n\nဒီလူကို Group ထဲကနေ အပြီးအပိုင် မောင်းထုတ် (Ban) ลိုက်ပါပြီဗျာ။", parse_mode='Markdown')
+            bot.reply_to(message, f"🚨 **Ban လိုက်ပြီ!**\n👤 **Name:** {t_name}\n🆔 **User ID:** `{t_id}`\n\nဒီလူကို Group ထဲကနေ အပြီးအပိုင် မောင်းထုတ် (Ban) လိုက်ပါပြီဗျာ။", parse_mode='Markdown')
             
         elif command == '/mute':
             readonly_perms = types.ChatPermissions(
@@ -111,7 +125,7 @@ def admin_commands(message):
     except Exception as error:
         bot.reply_to(message, f"❌ Error: Bot မှာ Admin Permission မပြည့်စုံသေးလို့ ဖြစ်နိုင်ပါတယ်ဗျာ။")
 
-# --- ၃။ AI & Bad Words Check (သူ့ကိုခေါ်မှပဲ စာပြန်မည့်စနစ်) ---
+# --- ၃။ AI & Bad Words Check ---
 @bot.message_handler(func=lambda message: True)
 def handle_all_messages(message):
     if not message.text: return
@@ -145,6 +159,7 @@ def handle_all_messages(message):
             print(f"AI Error: {e}")
 
 if __name__ == "__main__":
-    print("Aibot with Updated Welcome Message is running on Render...")
+    print("Starting Web Server Keep-Alive...")
+    keep_alive()  # Web server ကို နောက်ကွယ်ကနေ Run ပေးထားခြင်း
+    print("Aibot with Web Service Compatibility is running...")
     bot.infinity_polling()
-    
