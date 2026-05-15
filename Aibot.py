@@ -1,4 +1,4 @@
-import telebot
+Import telebot
 import google.generativeai as genai
 from telebot import types
 import time
@@ -60,4 +60,3 @@ def handle_all_messages(message):
 if __name__ == "__main__":
     print("Aibot is running on Render...")
     bot.infinity_polling()
-  
